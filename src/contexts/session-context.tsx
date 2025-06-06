@@ -4,7 +4,7 @@ import { useGetProfileQuery } from "@/queries/get-profile-query";
 // import { SplashScreen } from "@/components/splash-screen";
 import React, { ReactNode } from "react";
 
-const SplashScreen = () => {
+export const SplashScreen = () => {
     return (
         <div className="flex flex-col items-center justify-center h-screen">
             <h1>Loading...</h1>
