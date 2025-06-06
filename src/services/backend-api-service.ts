@@ -2,7 +2,7 @@
 import { ApiResponse } from "@/@types/api/api-response";
 import { BaseApiService } from "@/services/base-api-service";
 import { auth } from "@/lib/firebase";
-import type { AxiosInstance, AxiosResponse } from "axios";
+import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
 import type { Auth } from "firebase/auth";
 import { ErrorResponse } from "@/@types/api/error-response";
 
@@ -65,40 +65,43 @@ export class BackendApiService extends BaseApiService {
         return { ...(await this.getAuthHeaders()), ...headers };
     }
 
-    private async request<TResponse>(
+    private async request<TResponse, TRequest = undefined>(
         method: "get" | "post" | "patch" | "put" | "delete",
         url: string,
-        data?: any,
+        data?: TRequest,
         headers?: Record<string, string>
     ): Promise<ApiResponse<TResponse>> {
         const _headers = await this.buildAuthHeaders(headers);
+
+        const config: AxiosRequestConfig = {
+            method,
+            url,
+            headers: _headers,
+            ...(data !== undefined && { data }),
+        };
+
         try {
-            const response: AxiosResponse<TResponse> = await this.api.request<TResponse>({
-                method,
-                url,
-                data,
-                headers: _headers,
-            });
+            const response: AxiosResponse<TResponse> = await this.api.request(config);
             return { status: response.status, data: response.data };
         } catch (error) {
             throw this.handleError(error);
         }
     }
 
-    protected get<T>(url: string, headers?: Record<string, string>) {
-        return this.request<T>("get", url, undefined, headers);
+    protected get<TResponse>(url: string, headers?: Record<string, string>) {
+        return this.request<TResponse>("get", url, undefined, headers);
     }
 
     protected post<TRequest, TResponse>(url: string, data: TRequest, headers?: Record<string, string>) {
-        return this.request<TResponse>("post", url, data, headers);
+        return this.request<TResponse, TRequest>("post", url, data, headers);
     }
 
     protected patch<TRequest, TResponse>(url: string, data: TRequest, headers?: Record<string, string>) {
-        return this.request<TResponse>("patch", url, data, headers);
+        return this.request<TResponse, TRequest>("patch", url, data, headers);
     }
 
     protected put<TRequest, TResponse>(url: string, data: TRequest, headers?: Record<string, string>) {
-        return this.request<TResponse>("put", url, data, headers);
+        return this.request<TResponse, TRequest>("put", url, data, headers);
     }
 
     protected delete<TResponse>(url: string, headers?: Record<string, string>) {
