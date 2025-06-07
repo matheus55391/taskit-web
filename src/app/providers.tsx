@@ -1,4 +1,4 @@
-import { Toaster } from "@/components/ui/sonner"
+import { Toaster } from "@/components/ui/sonner";
 import { TanstackQueryProvider } from "@/contexts/tanstack-query-provider";
 import { ThemeProvider } from "@/contexts/theme-context";
 
