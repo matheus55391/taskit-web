@@ -17,24 +17,6 @@ export class BackendApiService extends BaseApiService {
         this.firebaseAuth = auth;
     }
 
-    private handleError(error: any): ErrorResponse {
-        if (error?.response) {
-            const { status, data } = error.response;
-            return {
-                status,
-                message: data?.message || "Erro na requisição",
-                errors: data?.errors || [data?.message || "Erro desconhecido"],
-            };
-        }
-
-        return {
-            status: 500,
-            message: error?.message || "Erro inesperado",
-            errors: [error?.message || "Erro desconhecido"],
-        };
-    }
-
-
     protected generateUrlWithParams<T extends object>(url: string, params: T) {
         const urlSearchParams = new URLSearchParams(
             Object.entries(params)
@@ -80,12 +62,9 @@ export class BackendApiService extends BaseApiService {
             ...(data !== undefined && { data }),
         };
 
-        try {
-            const response: AxiosResponse<TResponse> = await this.api.request(config);
-            return { status: response.status, data: response.data };
-        } catch (error) {
-            throw this.handleError(error);
-        }
+        const response: AxiosResponse<TResponse> = await this.api.request(config);
+        return { status: response.status, data: response.data };
+
     }
 
     protected get<TResponse>(url: string, headers?: Record<string, string>) {
